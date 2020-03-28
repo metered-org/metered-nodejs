@@ -72,7 +72,6 @@ Usage.Increment = (_this) => {
 	    event:'validate'
 	};
 	var objStr = JSON.stringify(obj);
-	_this.networker.send(objStr);
 	next();
 	return;
     };
@@ -88,7 +87,6 @@ Auth.Validate = (_this, collect, options) => {
 	};
 	m.config = _this.config;
 
-	req.metered = m;
 	if (typeof options != "undefined"){
 	    if(options.increment){
 		m.increment = true;
@@ -104,20 +102,13 @@ Auth.Increment = (_this, collect) => {
 }
 
 Auth.RemoteValidate = function(req,res,next,_this,m){
-    if (m.config.apikey.length && (m.customer.length || m.subscription.length)){
-	//do server auth with the _this.apikey
-
-	/*if(_this.networker){
-	    _this.networker.setHandler(function(data){
-	      //tcp implementation
-	    });
-	    _this.networker.send(JSON.stringify(n));
-	}*/
-
+    console.log('m.config:', m.config, ' m.customer: ', m['customer'], ' sub:',m.subscription);
+    if (m.config.apikey.length && (m.customer || m['subscription'] )){
 	//http
 	_this.Post(m, function(err,resp){
 	    if (!err){
 		if (resp.success){
+		    req.metered = {};
 		    req.metered.request = m;
 		    req.metered.response = resp.data;
 		    next();
