@@ -104,7 +104,7 @@ Auth.Increment = (_this, collect) => {
 }
 
 Auth.RemoteValidate = function(req,res,next,_this,m){
-    if (m.config.apikey.length && (m.customer.length || m.subscription.length){
+    if (m.config.apikey.length && (m.customer.length || m.subscription.length)){
 	//do server auth with the _this.apikey
 
 	/*if(_this.networker){
