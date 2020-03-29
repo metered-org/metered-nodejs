@@ -39,6 +39,7 @@ Config.prototype.Post = function(params, cb){
     };
 
     var h = _this.config.port == 443 ? https : http;
+
     const req = h.request(options, (res) => {
 	res.on('data', (d) => {
 	    if(res.statusCode==200){
@@ -102,7 +103,6 @@ Auth.Increment = (_this, collect) => {
 }
 
 Auth.RemoteValidate = function(req,res,next,_this,m){
-    console.log('m.config:', m.config, ' m.customer: ', m['customer'], ' sub:',m.subscription);
     if (m.config.apikey.length && (m.customer || m['subscription'] )){
 	//http
 	_this.Post(m, function(err,resp){

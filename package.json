@@ -1,6 +1,6 @@
 {
   "name": "metered",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Library for API creators to add middleware to authenticate and record usage",
   "main": "metered.js",
   "scripts": {
