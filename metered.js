@@ -2,7 +2,7 @@
 const net = require('net');
 const https = require('https')
 const http = require('http')
-var VERSION = '0.3.0';
+var VERSION = '0.3.1';
 
 var Config = function(config){
     var _this = this;
