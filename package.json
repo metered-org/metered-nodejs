@@ -1,6 +1,6 @@
 {
   "name": "metered",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Library for API creators to add middleware to authenticate and record usage",
   "main": "metered.js",
   "scripts": {
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/metered-org/metered-nodejs/issues"
   },
-  "homepage": "https://github.com/metered-org/metered-nodejs#readme"
+  "homepage": "https://github.com/metered-org/metered-nodejs#readme",
+  "dependencies": {
+    "aws4": "^1.9.1"
+  }
 }

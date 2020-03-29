@@ -2,7 +2,7 @@
 const net = require('net');
 const https = require('https')
 const http = require('http')
-var VERSION = 1;
+var VERSION = '0.3.0';
 
 var Config = function(config){
     var _this = this;
@@ -12,6 +12,36 @@ var Config = function(config){
     if(this.config.tcp){
 	this.config.hostPort = {host: this.config.host, port: this.config.port};
     }
+};
+
+Config.prototype.Https = function(options, body, cb){
+    options.port = 443;
+    return this.Http(options, body, cb);
+};
+
+Config.prototype.Http = function(options, params, cb){
+
+    var h = options.port == 443 ? https : http;
+
+    const req = h.request(options, (res) => {
+	res.on('data', (d) => {
+	    cb(null, d.toString(), res);
+	});
+	res.on('error', (err) => {
+	    cb(err);
+	});
+    });
+    
+    req.on('error', (err) => {
+	//POST error
+	cb(err);
+    });
+
+    if (params){
+	req.write(params);
+    }
+
+    req.end();
 };
 
 Config.prototype.Post = function(params, cb){
@@ -24,38 +54,20 @@ Config.prototype.Post = function(params, cb){
 	cb({success:false, error: {message:"bad apikey"}});
 	return;
     }
-    var data = JSON.stringify(params);
+    var body = JSON.stringify(params);
 
     const options = {
 	hostname: _this.config.host,
 	port: _this.config.port||443,
-	path: (_this.config.path||'')+'/api/metered/'+VERSION+'/webhooks/validate',
+	path: (_this.config.path||'/') +'api/metered/'+VERSION+'/webhooks/validate',
 	method: 'POST',
 	headers: {
 	    'Content-Type': 'application/json',
-	    'Content-Length': data.length,
+	    'Content-Length': body.length,
 	    'apikey':_this.config.apikey
 	}
     };
-
-    var h = _this.config.port == 443 ? https : http;
-
-    const req = h.request(options, (res) => {
-	res.on('data', (d) => {
-	    if(res.statusCode==200){
-		cb(null, JSON.parse(d.toString()));
-	    }else{
-		cb(res);
-	    }
-	});
-    });
-    
-    req.on('error', (error) => {
-	//POST error
-    });
-    
-    req.write(data);
-    req.end();
+    _this.Http(options, body, cb);
 };
 
 var Usage = {};
@@ -105,15 +117,14 @@ Auth.Increment = (_this, collect) => {
 Auth.RemoteValidate = function(req,res,next,_this,m){
     if (m.config.apikey.length && (m.customer || m['subscription'] )){
 	//http
-	_this.Post(m, function(err,resp){
+	_this.Post(m, function(err, data, resp){
 	    if (!err){
-		if (resp.success){
+		if (resp.statusCode == 200){
 		    req.metered = {};
 		    req.metered.request = m;
-		    req.metered.response = resp.data;
+		    req.metered.response = JSON.parse(data);
 		    next();
 		}else{
-		    res.send(resp);
 		    next(resp);
 		}
 	    }
